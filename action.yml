@@ -7,6 +7,10 @@ author: 'ciscorucinski'
 
 inputs:
 
+  personal_access_token:
+    description: 'A Github PAT'
+    required: true
+
   delete_comment:
     required: false
     description: |
@@ -56,14 +60,11 @@ runs:
   using: "composite"
 
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
     - name: Checkout private repository
       uses: actions/checkout@v4
       with:
         repository: ${{ inputs.remote_repository }}      # Private Repo location
-        token: ${{ secrets.PAT }}
+        token: ${{ inputs.personal_access_token }}
 
     - name: Get trigger phrases from another repository
       id: get_trigger_phrases
