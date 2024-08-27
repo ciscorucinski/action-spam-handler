@@ -65,6 +65,8 @@ runs:
       with:
         repository: ${{ inputs.remote_repository }}      # Private Repo location
         token: ${{ inputs.personal_access_token }}
+        sparse-checkout: |                          # New-line deliminated file
+            ${{ inputs.trigger_file }}
 
     - name: Get trigger phrases from another repository
       id: get_trigger_phrases
