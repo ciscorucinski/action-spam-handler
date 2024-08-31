@@ -11,20 +11,28 @@ inputs:
     description: 'A Github PAT'
     required: true
 
+
   delete_comment:
     required: false
     description: |
       Automatically delete comments identified as spam.
       Default: False
     default: 'false'
-
-
+    
   block_commenter:
     required: false
     description: |
       Automatically block commenter identified as spammer.
       Default: False
     default: 'false'
+
+
+  is_organization:
+    required: false
+    description: |
+      Determines if blocking a commenter will occur on the organization level or not
+    default: 'false'
+  
 
   remote_repository:
     required: true
@@ -55,6 +63,19 @@ outputs:
     description: |
       Comment content
     value: ${{ github.event.issue.body }}
+
+  is_comment_deleted:
+    description: |
+      Did the comment successfully get deleted
+      Type: String
+    value: ${{ steps.comment_deleted.outputs.result }}
+
+  is_commenter_blocked:
+    description: |
+      Did the commenter successfully get blocked
+      Type: String
+    value: ${{ steps.block_commenter.outputs.result }}
+
 
 runs:
   using: "composite"
@@ -90,25 +111,29 @@ runs:
         TRIGGER_PHRASES: ${{ steps.get_trigger_phrases.outputs.triggers }}
 
     - name: Delete comment if it contains any trigger
+      id: delete_comment
       if: ${{ inputs.delete_comment == 'true' && steps.check_comment.outputs.result == 'true' }}
       uses: actions/github-script@v7
       with:
         script: |
           const commentId = context.payload.comment.id;
-          await github.rest.issues.deleteComment({
+          const response = await github.rest.issues.deleteComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             comment_id: commentId
           });
+          return response;
 
     - name: Block user if comment contains any trigger
+      id: block_commenter
       if: ${{ inputs.block_commenter == 'true' && steps.check_comment.outputs.result == 'true' }}
       uses: actions/github-script@v7
       with:
         script: |
           const userId = context.payload.comment.user.id;
-          await github.rest.users.block({
+          const response = await github.rest.users.block({
             owner: context.repo.owner,
             repo: context.repo.repo,
             user_id: userId
           });
+          return response;
