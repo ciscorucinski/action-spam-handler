@@ -122,6 +122,7 @@ runs:
             repo: context.repo.repo,
             comment_id: commentId
           });
+          console.log(response);
           return response;
 
     - name: Block user if comment contains any trigger
@@ -136,4 +137,5 @@ runs:
             repo: context.repo.repo,
             user_id: userId
           });
+          console.log(response);
           return response;
