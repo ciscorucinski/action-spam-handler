@@ -68,7 +68,7 @@ outputs:
     description: |
       Did the comment successfully get deleted
       Type: String
-    value: ${{ steps.comment_deleted.outputs.result }}
+    value: ${{ steps.delete_comment.outputs.result }}
 
   is_commenter_blocked:
     description: |
@@ -123,7 +123,7 @@ runs:
             comment_id: commentId
           });
           console.log(response);
-          return response;
+          return response.status == 204;
 
     - name: Block user if comment contains any trigger
       id: block_commenter
@@ -138,4 +138,4 @@ runs:
             user_id: userId
           });
           console.log(response);
-          return response;
+          return response.status == 204;
